@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/nomflixclone/static/js/main.acbaaf66.js",
+    "index.html": "/nomflixclone/index.html",
+    "main.acbaaf66.js.map": "/nomflixclone/static/js/main.acbaaf66.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.acbaaf66.js"
+  ]
+}
