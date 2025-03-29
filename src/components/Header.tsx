@@ -92,18 +92,6 @@ const Input = styled(motion.input)<{ $isbgblack: boolean }>`
   border: px solid ${(props) => props.theme.white.lighter};
 `;
 
-// const logoVariants = {
-//   normal: {
-//     fillOpacity: 1,
-//   },
-//   active: {
-//     fillOpacity: [0, 1, 0],
-//     transition: {
-//       repeat: Infinity,
-//     },
-//   },
-// };
-
 const logoVariants: Variants = {
   initial: { pathLength: 0, fill: "rgba(232, 65, 24,0.0)" },
   whileHover: {
@@ -171,14 +159,6 @@ function Header() {
     <Nav variants={navVariants} animate={navAnimation} initial={"top"}>
       <Col>
         <Logo
-          // variants={logoVariants}
-          // whileHover="active"
-          // animate="normal"
-          // xmlns="http://www.w3.org/2000/svg"
-          // width="1024"
-          // height="276.742"
-          // viewBox="0 0 1024 276.742"
-
           stroke="white"
           strokeWidth={0.5}
           variants={logoVariants}

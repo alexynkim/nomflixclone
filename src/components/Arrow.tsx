@@ -10,7 +10,6 @@ const BtnContainer = styled.div<{ $isRight: boolean }>`
   position: absolute;
   top: 100px;
   ${(props) => (props.$isRight ? { left: "30px" } : { right: "30px" })};
-  //right: ${(props) => (props.$isRight ? "97%" : "3%")};
 
   background: transparent;
   display: block;

@@ -151,12 +151,7 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
     const url = keyword
       ? "/search" + base + `?keyword=${encodeURIComponent(keyword)}`
       : base;
-    // if (isMovie(media)) {
-    //   navigate(`/movies/${media.id}`);
-    // } else {
-    //   navigate(`/tv/${media.id}`);
-    //   return;
-    // }
+
     navigate(url);
   };
 

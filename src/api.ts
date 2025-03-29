@@ -168,20 +168,6 @@ function getUpcomingMovies(dummy: string) {
   );
 }
 
-//Detail Movie Infomation
-function getDetailMovie(id: string) {
-  return fetch(`${BASE_PATH}/movie/${id}?api_key=${API_KEY}`).then((response) =>
-    response.json()
-  );
-}
-
-//Credit Actor
-function getCreditInfo(id: string) {
-  return fetch(`${BASE_PATH}/movie/${id}/credits?api_key=${API_KEY}`).then(
-    (response) => response.json()
-  );
-}
-
 function getOnTheAirTV(dummy: string) {
   return fetch(`${BASE_PATH}/tv/on_the_air?api_key=${API_KEY}`).then(
     (response) => response.json()
@@ -206,20 +192,6 @@ function getTopRatedTV(dummy: string) {
   );
 }
 
-//Detail Movie Infomation
-function getDetailTV(id: string) {
-  return fetch(`${BASE_PATH}/tv/${id}?api_key=${API_KEY}`).then((response) =>
-    response.json()
-  );
-}
-
-//Credit Actor
-function getCreditTVInfo(id: string) {
-  return fetch(`${BASE_PATH}/tv/${id}/credits?api_key=${API_KEY}`).then(
-    (response) => response.json()
-  );
-}
-
 //Search Movie
 function getSearchKeywordMovie(keyword: string) {
   return fetch(
@@ -234,4 +206,30 @@ function getSearchKeywordTV(keyword: string) {
   ).then((response) => response.json());
 }
 
-//https://api.themoviedb.org/3/search/tv?query=white&api_key=70bd27b483e78304dc732a3fa531b5b0
+//Detail Movie Infomation
+function getDetailMovie(id: string) {
+  return fetch(`${BASE_PATH}/movie/${id}?api_key=${API_KEY}`).then((response) =>
+    response.json()
+  );
+}
+
+//Detail TV Infomation
+function getDetailTV(id: string) {
+  return fetch(`${BASE_PATH}/tv/${id}?api_key=${API_KEY}`).then((response) =>
+    response.json()
+  );
+}
+
+//Credit Actor
+function getCreditInfo(id: string) {
+  return fetch(`${BASE_PATH}/movie/${id}/credits?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
+}
+
+//Credit Actor
+function getCreditTVInfo(id: string) {
+  return fetch(`${BASE_PATH}/tv/${id}/credits?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
+}
