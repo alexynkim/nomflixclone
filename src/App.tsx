@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
 import { theme } from "./theme.ts";
-import { ThemeProvider, DefaultTheme } from "styled-components";
+import { ThemeProvider } from "styled-components";
 import Header from "./components/Header.tsx";
 
 const GlobalStyle = createGlobalStyle`

@@ -1,11 +1,7 @@
 import React from "react";
-import { createBrowserRouter } from "react-router-dom";
 import { createHashRouter } from "react-router-dom";
 import App from "./App.tsx";
 import Home from "./Routes/Home.tsx";
-import TV from "./Routes/Tv.tsx";
-import Search from "./Routes/Search.tsx";
-import ExpandMovie from "./components/ExpandMovie.tsx";
 import DetailMovie from "./components/DetailMovie.tsx";
 
 const router = createHashRouter([
@@ -25,11 +21,27 @@ const router = createHashRouter([
       },
       {
         path: "tv",
-        element: <TV />,
+        element: <Home />,
+        children: [
+          {
+            path: "/tv/:tvId",
+            element: <DetailMovie />,
+          },
+        ],
       },
       {
-        path: "search",
-        element: <Search />,
+        path: "/search",
+        element: <Home />,
+        children: [
+          {
+            path: "/search/movies/:tvId",
+            element: <DetailMovie />,
+          },
+          {
+            path: "/search/tv/:tvId",
+            element: <DetailMovie />,
+          },
+        ],
       },
     ],
   },

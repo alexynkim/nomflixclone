@@ -1,10 +1,17 @@
 import React from "react";
 import styled from "styled-components";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useSearchParams } from "react-router-dom";
 import SliderMovies from "../components/SliderMovies.tsx";
 import Banner from "../components/Banner.tsx";
-import { MovieDataFunc, IGetMoviesResult } from "../api.ts";
+import {
+  MovieDataFunc,
+  TVDataFunc,
+  SearchDataFunc,
+  IGetMediaResult,
+} from "../api.ts";
 
 const Wrapper = styled.div`
   background: black;
@@ -26,11 +33,31 @@ const TrailerContainer = styled.div`
 `;
 
 function Home() {
-  const datas = MovieDataFunc[0]; //Now Playing
-  const { data, isLoading } = useQuery<IGetMoviesResult>({
-    queryKey: [datas.key, datas.category],
-    queryFn: async () => await datas.fetchFn(),
+  const [update, setUpdate] = useState(0);
+  const currPath = useLocation();
+  const getDataFunc = currPath.pathname.includes("/search")
+    ? SearchDataFunc
+    : currPath.pathname.includes("/tv")
+    ? TVDataFunc
+    : MovieDataFunc;
+  const [searchParams] = useSearchParams();
+  const keyword = searchParams.get("keyword");
+  const navigate = useNavigate();
+  useEffect(() => {
+    setTimeout(() => {
+      setUpdate((p) => p + 1);
+    }, 60000);
+  }, [update]);
+
+  const datas = getDataFunc[0]; //Now Playing
+  const { data, isLoading } = useQuery<IGetMediaResult>({
+    queryKey: [datas.key, datas.category + keyword],
+    queryFn: async () => await datas.fetchFn(keyword ?? ""),
   });
+
+  if (!isLoading && (!data || !data.results || data.total_results === 0)) {
+    navigate("/");
+  }
 
   return (
     <Wrapper>
@@ -38,12 +65,15 @@ function Home() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          {data?.results[0] && <Banner movie={data.results[0]} />}
+          {data?.results[0] && (
+            <Banner media={data.results[update % data.results.length]} />
+          )}
           <TrailerContainer>
-            <SliderMovies MovieData={MovieDataFunc[0]} />
-            <SliderMovies MovieData={MovieDataFunc[1]} />
-            <SliderMovies MovieData={MovieDataFunc[2]} />
-            <SliderMovies MovieData={MovieDataFunc[3]} />
+            {getDataFunc.map((funcData, id) => (
+              <div key={id}>
+                <SliderMovies MediaData={funcData} />
+              </div>
+            ))}
           </TrailerContainer>
           <Outlet />
         </>

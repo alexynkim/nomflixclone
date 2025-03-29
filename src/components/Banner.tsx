@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { makeImagePath } from "../utils.ts";
-import { IMovie } from "../api.ts";
+import { IMedia, isMovie } from "../api.ts";
 
 const BannerContainer = styled.div<{ $bgphoto: string }>`
   height: 100vh;
@@ -17,19 +17,36 @@ const BannerContainer = styled.div<{ $bgphoto: string }>`
 const Title = styled.h2`
   font-size: 68px;
   margin-bottom: 20px;
+  width: 100%;
 `;
 
 const Overview = styled.p`
   font-size: 30px;
-  width: 50%;
+  width: 70%;
+  max-height: 60%;
+  overflow: hidden;
 `;
 
-function Banner({ movie }: { movie: IMovie }) {
+const Container = styled.div`
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 50px;
+  width: 70%;
+  max-height: 50%;
+  border-radius: 20px;
+`;
+
+function Banner({ media }: { media: IMedia }) {
   return (
     <>
-      <BannerContainer $bgphoto={makeImagePath(movie?.backdrop_path || "")}>
-        <Title>{movie?.title}</Title>
-        <Overview>{movie?.overview}</Overview>
+      <BannerContainer $bgphoto={makeImagePath(media?.backdrop_path || "")}>
+        <Container>
+          {isMovie(media) ? (
+            <Title>{media?.title}</Title>
+          ) : (
+            <Title>{media?.name}</Title>
+          )}
+          <Overview>{media?.overview}</Overview>
+        </Container>
       </BannerContainer>
     </>
   );

@@ -1,16 +1,15 @@
 import React from "react";
 import styled from "styled-components";
-import { useNavigate, useParams, useMatch } from "react-router-dom";
+import { useNavigate, useMatch } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import {
   ICreditData,
   IGetDetail,
-  getCreditInfo,
-  getDetailMovie,
+  DetailDataFunc,
+  CreditDataFunc,
 } from "../api.ts";
 import { makeImagePath } from "../utils.ts";
-import { useEffect } from "react";
 
 const OverlayMotion = {
   hidden: { opacity: 0 },
@@ -38,7 +37,7 @@ const Detail = styled(motion.div)`
   position: fixed;
   width: 50vw;
   height: auto;
-  top: 5vmin;
+  top: 10vmin;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -71,8 +70,8 @@ const PosterImage = styled.div<{ $bgphoto: string }>`
   background-position: center center;
   background-image: url(${(props) => props.$bgphoto});
   position: absolute;
-  left: 3vmin;
-  bottom: 3vmin;
+  right: 3vmin;
+  bottom: -5vmin;
   border-radius: 1vmin;
 `;
 
@@ -149,9 +148,20 @@ const ActorBox = styled.div`
   gap: 3px;
 `;
 
+const SeasonBox = styled.div`
+  width: 100%;
+  height: auto; //18vmin;
+  background-color: transparent;
+  display: flex;
+  justify-content: space-evenly;
+  margin: 2vmin 0vmin;
+  gap: 3px;
+  overflow-x: auto;
+`;
+
 const ActorList = styled(motion.div)`
   height: auto; //18vmin;
-  width: 10vmin;
+  min-width: 10vmin;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 1vmin;
 `;
@@ -169,7 +179,7 @@ const ActorImage = styled.div<{ $bgphoto: string }>`
 const ActorName = styled.div`
   height: auto; //1.5vmin;
   font-size: 1.2vmin;
-  margin-top: 1vmin;
+  margin: 0.5vmin;
   overflow: hidden;
   padding: 0 0.8vmin;
 `;
@@ -177,14 +187,14 @@ const ActorName = styled.div`
 const ActorCharacter = styled.div`
   height: auto; //.5vmin;
   font-size: 1.2vmin;
-  margin-top: 1vmin;
+  margin: 0.5vmin;
   overflow: hidden;
-  padding: 0 0.8vmin;
+  padding: 0.8vmin 0.8vmin;
 `;
 
 const DirectorList = styled(motion.div)`
   height: auto; //18vmin;
-  width: 10vmin;
+  min-width: 10vmin;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 1vmin;
 `;
@@ -222,38 +232,66 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-function DetailMovie() {
+function GetIDnMedia(): { isMovie: boolean; id: number | undefined } {
   const matchMovie = useMatch("/movies/:movieId");
+  const searchMovie = useMatch("/search/movies/:movieId");
+  const searchTV = useMatch("/search/tv/:tvID");
+  const matchTV = useMatch("/tv/:tvID");
+
+  const matchedMovie = matchMovie ?? searchMovie;
+  const matchedTV = matchTV ?? searchTV;
+
+  const isMovie = matchedMovie ? true : false;
+  const mediaId = matchedMovie?.params.movieId ?? matchedTV?.params.tvID;
+  const parsedMediaId = mediaId ? parseInt(mediaId, 10) : undefined;
+
+  return { isMovie: isMovie, id: parsedMediaId };
+}
+
+function DetailMovie() {
   const navigate = useNavigate();
   const onOverlay = () => navigate(-1);
-  const id = matchMovie?.params.movieId;
+  const { isMovie, id } = GetIDnMedia() as {
+    isMovie: boolean;
+    id: number | undefined;
+  };
 
-  console.log(`movieId : ${id} matchMovie: `, matchMovie);
+  const getDetailFunc = DetailDataFunc; // 0: Movie, 1: TV
+  const getCreditFunc = CreditDataFunc; // 0: Movie, 1: TV
+  const queryindex = isMovie ? 0 : 1;
 
   const { data: detailData, isLoading: isDetailLoading } = useQuery<IGetDetail>(
     {
-      queryKey: ["movie", id],
-      queryFn: () => getDetailMovie(id!),
+      queryKey: [getDetailFunc[queryindex].key, id],
+      queryFn: () => getDetailFunc[queryindex].fetchFn(id! + ""),
       enabled: !!id, // Only enable the query if `id` is truthy
     }
   );
 
   const { data: creditData, isLoading: isCreditLoading } =
     useQuery<ICreditData>({
-      queryKey: ["credit", id],
-      queryFn: () => getCreditInfo(id!),
+      queryKey: [getCreditFunc[queryindex].key, id],
+      queryFn: () => getCreditFunc[queryindex].fetchFn(id! + ""),
       enabled: !!id, // Only enable the query if `id` is truthy
     });
 
-  if (!matchMovie) return;
+  const actor = isMovie ? creditData?.cast.slice(0, 4) : null;
+  const director = isMovie
+    ? creditData?.crew.find(
+        (person) => person.known_for_department === "Directing"
+      )
+    : null;
 
-  const actor = creditData?.cast.slice(0, 4);
-  const director = creditData?.crew.find(
-    (person) => person.known_for_department === "Directing"
-  );
+  const title = isMovie ? detailData?.title : detailData?.name;
+  const originalTitle = isMovie
+    ? detailData?.original_title
+    : detailData?.original_name;
+  const releaseDate = isMovie
+    ? detailData?.release_date
+    : detailData?.first_air_date;
 
-  console.log("detail data", detailData);
-  console.log("credit data", creditData);
+  const season = isMovie ? [] : detailData?.seasons;
+
   return (
     <>
       <Overlay
@@ -283,8 +321,8 @@ function DetailMovie() {
                 />
               </BackGorundImage>
               <MovieDetailTitle>
-                <DetailTitle>{detailData.title}</DetailTitle>
-                <OriginalTitle>{detailData.original_title}</OriginalTitle>
+                <DetailTitle>{title}</DetailTitle>
+                <OriginalTitle>{originalTitle}</OriginalTitle>
               </MovieDetailTitle>
               <DetailOverview>{detailData.overview}</DetailOverview>
               <GenreBox>
@@ -293,32 +331,52 @@ function DetailMovie() {
                 ))}
               </GenreBox>
               <InfoBox>
-                <Release>Release Day {detailData.release_date}</Release>
+                <Release>Release Day {releaseDate}</Release>
                 <Runtime>{detailData.runtime}minutes</Runtime>
               </InfoBox>
-              <ActorBox>
-                <DirectorList>
-                  <DirectorImage
-                    $bgphoto={makeImagePath(
-                      director?.profile_path + "",
-                      "w500"
-                    )}
-                  />
-                  <DirectorDepartment>
-                    {director?.known_for_department ? "Director" : null}
-                  </DirectorDepartment>
-                  <DirectorName>{director?.name}</DirectorName>
-                </DirectorList>
-                {actor?.map((cast) => (
-                  <ActorList key={cast.id}>
-                    <ActorImage
-                      $bgphoto={makeImagePath(cast.profile_path + "", "w500")}
+
+              {isMovie && (
+                <ActorBox>
+                  <DirectorList>
+                    <DirectorImage
+                      $bgphoto={makeImagePath(
+                        director?.profile_path + "",
+                        "w500"
+                      )}
                     />
-                    <ActorCharacter>{cast.character}</ActorCharacter>
-                    <ActorName>{cast.name}</ActorName>
-                  </ActorList>
-                ))}
-              </ActorBox>
+                    <DirectorDepartment>
+                      {director?.known_for_department ? "Director" : null}
+                    </DirectorDepartment>
+                    <DirectorName>{director?.name}</DirectorName>
+                  </DirectorList>
+                  {actor?.map((cast) => (
+                    <ActorList key={cast.id}>
+                      <ActorImage
+                        $bgphoto={makeImagePath(cast.profile_path + "", "w500")}
+                      />
+                      <ActorCharacter>{cast.character}</ActorCharacter>
+                      <ActorName>{cast.name}</ActorName>
+                    </ActorList>
+                  ))}
+                </ActorBox>
+              )}
+
+              {!isMovie && (
+                <SeasonBox>
+                  {season?.map((epic) => (
+                    <ActorList key={epic.id}>
+                      <ActorImage
+                        $bgphoto={makeImagePath(epic.poster_path + "", "w500")}
+                      />
+                      <ActorName>{epic.name}</ActorName>
+                      <ActorCharacter>
+                        season# {epic.season_number} (episode{" "}
+                        {epic.episode_count})
+                      </ActorCharacter>
+                    </ActorList>
+                  ))}
+                </SeasonBox>
+              )}
             </>
           )}
         </Detail>

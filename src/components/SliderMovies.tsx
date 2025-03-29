@@ -4,8 +4,8 @@ import { motion, Variants, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { makeImagePath } from "../utils.ts";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { IGetMoviesResult, IGetData } from "../api.ts";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { IGetMediaResult, IGetData, IMedia, isMovie } from "../api.ts";
 import Arrow from "./Arrow.tsx";
 
 const Slider = styled.div`
@@ -118,15 +118,18 @@ const infoVariants = {
 
 //============================================================================
 
-function SliderMovies({ MovieData }: { MovieData: IGetData }) {
-  const { data, isLoading } = useQuery<IGetMoviesResult>({
-    queryKey: [MovieData.key, MovieData.category],
-    queryFn: async () => await MovieData.fetchFn(),
+function SliderMovies({ MediaData }: { MediaData: IGetData }) {
+  const [searchParams] = useSearchParams();
+  const keyword = searchParams.get("keyword");
+
+  const { data, isLoading } = useQuery<IGetMediaResult>({
+    queryKey: [MediaData.key, MediaData.category + keyword],
+    queryFn: async () => await MediaData.fetchFn(keyword ?? ""),
   });
   const [leaving, setLeaving] = useState(false);
   const [index, setIndex] = useState(0);
   const [isRight, setIsRight] = useState(true);
-  const history = useNavigate();
+  const navigate = useNavigate();
   const offset = 6;
 
   const slidingIndex = (bRight: boolean) => {
@@ -143,21 +146,32 @@ function SliderMovies({ MovieData }: { MovieData: IGetData }) {
       );
   };
 
-  const onBoxClicked = (movieId: number) => {
-    history(`/movies/${movieId}`);
+  const onBoxClicked = (media: IMedia) => {
+    const base = isMovie(media) ? `/movies/${media.id}` : `/tv/${media.id}`;
+    const url = keyword
+      ? "/search" + base + `?keyword=${encodeURIComponent(keyword)}`
+      : base;
+    // if (isMovie(media)) {
+    //   navigate(`/movies/${media.id}`);
+    // } else {
+    //   navigate(`/tv/${media.id}`);
+    //   return;
+    // }
+    navigate(url);
   };
 
   const toggleLeaving = () => {
     if (!leaving) return;
-    console.log(data);
     setLeaving((prev) => !prev);
   };
 
-  console.log("index: ", index);
+  const slidingTitle = keyword
+    ? MediaData.category + ` "${keyword}"`
+    : MediaData.category;
   return (
     <>
       <Slider>
-        <Title>{MovieData.category}</Title>
+        <Title>{slidingTitle}</Title>
         {isLoading ? (
           <Loader>Loading...</Loader>
         ) : (
@@ -178,20 +192,27 @@ function SliderMovies({ MovieData }: { MovieData: IGetData }) {
               {data?.results
                 .slice(1)
                 .slice(offset * index, offset * index + offset)
-                .map((movie, ii) => (
+                .map((media, ii) => (
                   <Box
-                    layoutId={movie.id + "" + MovieData.key}
-                    key={movie.id}
+                    layoutId={media.id + "" + MediaData.key}
+                    key={media.id}
                     whileHover="hover"
                     initial="normal"
                     variants={boxVariants}
-                    onClick={() => onBoxClicked(movie.id)}
+                    onClick={() => onBoxClicked(media)}
                     transition={{ type: "tween" }}
-                    $bgphoto={makeImagePath(movie.backdrop_path, "w500")}
+                    $bgphoto={makeImagePath(
+                      media.backdrop_path || media.poster_path,
+                      "w500"
+                    )}
                   >
                     <Info variants={infoVariants}>
-                      <h4>{movie.title}</h4>
-                      <p>👍{movie.vote_average}</p>
+                      {isMovie(media) ? (
+                        <h4>{media.title}</h4>
+                      ) : (
+                        <h4>{media.name}</h4>
+                      )}
+                      <p>👍{media.vote_average}</p>
                     </Info>
                   </Box>
                 ))}

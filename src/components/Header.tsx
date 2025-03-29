@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { motion, useAnimation, useScroll } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { motion, useAnimation, useScroll, Variants } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.nav)`
@@ -92,21 +92,34 @@ const Input = styled(motion.input)<{ $isbgblack: boolean }>`
   border: px solid ${(props) => props.theme.white.lighter};
 `;
 
-const logoVariants = {
-  normal: {
-    fillOpacity: 1,
-  },
-  active: {
-    fillOpacity: [0, 1, 0],
+// const logoVariants = {
+//   normal: {
+//     fillOpacity: 1,
+//   },
+//   active: {
+//     fillOpacity: [0, 1, 0],
+//     transition: {
+//       repeat: Infinity,
+//     },
+//   },
+// };
+
+const logoVariants: Variants = {
+  initial: { pathLength: 0, fill: "rgba(232, 65, 24,0.0)" },
+  whileHover: {
+    pathLength: [1, 0, 1],
+    fillOpacity: [1, 0, 1],
     transition: {
       repeat: Infinity,
+      duration: 5,
     },
   },
+  animate: { pathLength: 1, fill: "rgba(232, 65, 24,1.0)" },
 };
 
 const navVariants = {
   top: {
-    backgroundColor: "rgba(0, 0, 0, 0)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   scroll: {
     backgroundColor: "rgba(0, 0, 0, 1)",
@@ -146,19 +159,33 @@ function Header() {
       }
     });
   }, [scrollY, navAnimation]);
-  const history = useNavigate();
-  const { register, handleSubmit } = useForm<IForm>();
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm<IForm>({
+    defaultValues: { keyword: "" },
+  });
   const onValid = (data: IForm) => {
-    history(`/search?keyword=${data.keyword}`);
+    navigate(`/search?keyword=${encodeURIComponent(data.keyword)}`);
   };
 
   return (
     <Nav variants={navVariants} animate={navAnimation} initial={"top"}>
       <Col>
         <Logo
+          // variants={logoVariants}
+          // whileHover="active"
+          // animate="normal"
+          // xmlns="http://www.w3.org/2000/svg"
+          // width="1024"
+          // height="276.742"
+          // viewBox="0 0 1024 276.742"
+
+          stroke="white"
+          strokeWidth={0.5}
           variants={logoVariants}
-          whileHover="active"
-          animate="normal"
+          initial="initial"
+          whileHover="whileHover"
+          transition={{ duration: 3 }}
+          animate="animate"
           xmlns="http://www.w3.org/2000/svg"
           width="1024"
           height="276.742"
