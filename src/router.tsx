@@ -5,6 +5,8 @@ import App from "./App.tsx";
 import Home from "./Routes/Home.tsx";
 import TV from "./Routes/Tv.tsx";
 import Search from "./Routes/Search.tsx";
+import ExpandMovie from "./components/ExpandMovie.tsx";
+import DetailMovie from "./components/DetailMovie.tsx";
 
 const router = createHashRouter([
   {
@@ -14,6 +16,12 @@ const router = createHashRouter([
       {
         path: "/",
         element: <Home />,
+        children: [
+          {
+            path: "movies/:movieId",
+            element: <DetailMovie />,
+          },
+        ],
       },
       {
         path: "tv",

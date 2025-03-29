@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useMatch, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { motion, useAnimation, useScroll } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
@@ -42,16 +42,18 @@ const Item = styled.li<{ $isbgblack: boolean }>`
   margin-right: 20px;
 
   color: ${(props) =>
-    props.$isbgblack
-      ? "white"
-      : "black"}; //props.theme.white.lighter : props.theme.white.darker};
+    props.$isbgblack ? props.theme.white.lighter : props.theme.white.darker};
   transition: color 0.3s ease-in-out;
   position: relative;
   display: flex;
   justify-content: center;
   flex-direction: column;
+  a {
+    color: inherit;
+  }
   &:hover {
-    color: ${(props) => props.theme.white.lighter};
+    //color: ${(props) => props.theme.white.lighter};
+    font-weight: bold;
   }
 `;
 
@@ -118,11 +120,13 @@ interface IForm {
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrollUpdate, setScrollUpdate] = useState(0);
-  const homeMatch = useMatch("/");
-  const tvMatch = useMatch("/tv");
+  const currpath = useLocation();
+  const homeMatch = currpath.pathname === "/";
+  const tvMatch = currpath.pathname === "/tv";
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
+
   const toggleSearch = () => {
     if (searchOpen) {
       inputAnimation.start({
@@ -164,14 +168,9 @@ function Header() {
         </Logo>
         <Items>
           <Item $isbgblack={scrollUpdate > 80}>
-            <Link to="/">
-              Home{" "}
-              {homeMatch && window.location.pathname === homeMatch.pathname && (
-                <Circle layoutId="circle" />
-              )}
-            </Link>
+            <Link to="/">Home {homeMatch && <Circle layoutId="circle" />}</Link>
           </Item>
-          <Item>
+          <Item $isbgblack={scrollUpdate > 80}>
             <Link to="/tv">
               Tv Shows {tvMatch && <Circle layoutId="circle" />}
             </Link>
