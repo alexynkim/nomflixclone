@@ -123,8 +123,9 @@ const GenreList = styled.span`
 const InfoBox = styled.div`
   width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin: 1vmin 0;
+  padding: 2vmin;
 `;
 
 const Release = styled.div`
@@ -275,7 +276,7 @@ function DetailMovie() {
       enabled: !!id, // Only enable the query if `id` is truthy
     });
 
-  const actor = isMovie ? creditData?.cast.slice(0, 4) : null;
+  const actor = isMovie ? creditData?.cast?.slice(0, 4) : null;
   const director = isMovie
     ? creditData?.crew.find(
         (person) => person.known_for_department === "Directing"
@@ -331,8 +332,10 @@ function DetailMovie() {
                 ))}
               </GenreBox>
               <InfoBox>
-                <Release>Release Day {releaseDate}</Release>
-                <Runtime>{detailData.runtime}minutes</Runtime>
+                {releaseDate && <Release>Release Day {releaseDate}</Release>}
+                {detailData.runtime && (
+                  <Runtime>{detailData.runtime}minutes</Runtime>
+                )}
               </InfoBox>
 
               {isMovie && (

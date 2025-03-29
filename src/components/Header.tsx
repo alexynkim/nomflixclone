@@ -15,6 +15,7 @@ const Nav = styled(motion.nav)`
   font-size: 14px;
   padding: 20px 60px;
   color: white;
+  z-index: 20;
 `;
 
 const Col = styled.div`
@@ -93,7 +94,7 @@ const Input = styled(motion.input)<{ $isbgblack: boolean }>`
 `;
 
 const logoVariants: Variants = {
-  initial: { pathLength: 0, fill: "rgba(232, 65, 24,0.0)" },
+  initial: { pathLength: 0, fill: "rgba(255, 255, 255,0.0)" },
   whileHover: {
     pathLength: [1, 0, 1],
     fillOpacity: [1, 0, 1],
@@ -102,7 +103,7 @@ const logoVariants: Variants = {
       duration: 5,
     },
   },
-  animate: { pathLength: 1, fill: "rgba(232, 65, 24,1.0)" },
+  animate: { pathLength: 1, fill: "rgba(255, 255, 255,1.0)" },
 };
 
 const navVariants = {
@@ -110,7 +111,7 @@ const navVariants = {
     backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   scroll: {
-    backgroundColor: "rgba(0, 0, 0, 1)",
+    backgroundColor: "rgb(220, 38, 38)", //"rgba(0, 0, 0, 1)",
   },
 };
 

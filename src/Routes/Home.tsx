@@ -59,6 +59,17 @@ function Home() {
     navigate("/");
   }
 
+  //filtering data without image
+  //console.log("before :", data?.results.length);
+  const filtered = data?.results.filter((movie) =>
+    movie.backdrop_path ? true : false
+  );
+
+  if (data && data.results && filtered) {
+    data.results = [...filtered];
+  }
+  //console.log("After :", data?.results.length);
+
   return (
     <Wrapper>
       {isLoading ? (
