@@ -214,7 +214,7 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
               >
                 {filteredResults?.map((media, ii) => (
                   <Box
-                    layoutId={media.id + "" + MediaData.key}
+                    layoutId={media.id + "" + MediaData.key + Date.now()} //add Date.now() for smoothing sliding,
                     key={media.id}
                     whileHover="hover"
                     initial="normal"
@@ -237,7 +237,7 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
                 ))}
               </Row>
             </AnimatePresence>
-            <Arrow slidingIndex={slidingIndex} />
+            {dataLength > offset && <Arrow slidingIndex={slidingIndex} />}
           </>
         )}
       </Slider>
