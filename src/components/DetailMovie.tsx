@@ -163,7 +163,7 @@ const SeasonBox = styled.div`
 const ActorList = styled(motion.div)`
   height: auto; //18vmin;
   min-width: 10vmin;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 1vmin;
 `;
 
@@ -196,7 +196,7 @@ const ActorCharacter = styled.div`
 const DirectorList = styled(motion.div)`
   height: auto; //18vmin;
   min-width: 10vmin;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 1vmin;
 `;
 

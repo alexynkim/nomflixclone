@@ -51,7 +51,7 @@ const Box = styled(motion.div)<{ $bgphoto: string }>`
 
 const Info = styled(motion.div)`
   padding: 10px;
-  background-color: rgba(99, 110, 114, 1);
+  background: transparent;
   color: rgba(223, 230, 233, 1);
   opacity: 0;
   position: absolute;
@@ -60,12 +60,7 @@ const Info = styled(motion.div)`
 
   h4 {
     text-align: center;
-    font-size: 18px;
-  }
-  p {
-    padding-top: 10px;
-    text-align: end;
-    font-size: 15px;
+    font-size: 16px;
   }
 `;
 
@@ -231,7 +226,6 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
                     ) : (
                       <h4>{media.name}</h4>
                     )}
-                    <p>👍{media.vote_average}</p>
                   </Info>
                 </Box>
               ))}
