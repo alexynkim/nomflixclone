@@ -13,6 +13,7 @@ import {
 } from "../api.ts";
 
 const Wrapper = styled.div`
+  min-height: 100vh;
   background: black;
   padding-bottom: 200px;
 `;
