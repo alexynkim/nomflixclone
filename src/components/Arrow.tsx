@@ -13,6 +13,7 @@ const BtnContainer = styled.div<{ $isRight: boolean }>`
 
   background: transparent;
   display: block;
+  border: none;
 
   &:hover {
     display: block;

@@ -1,5 +1,10 @@
 import React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 import styled from "styled-components";
 import { motion, useAnimation, useScroll, Variants } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -93,28 +98,6 @@ const Input = styled(motion.input)<{ $isbgblack: boolean }>`
   border: px solid ${(props) => props.theme.white.lighter};
 `;
 
-const logoVariants: Variants = {
-  initial: { pathLength: 0, fill: "rgba(255, 255, 255,0.0)" },
-  whileHover: {
-    pathLength: [1, 0, 1],
-    fillOpacity: [1, 0, 1],
-    transition: {
-      repeat: Infinity,
-      duration: 5,
-    },
-  },
-  animate: { pathLength: 1, fill: "rgba(255, 255, 255,1.0)" },
-};
-
-const navVariants = {
-  top: {
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-  },
-  scroll: {
-    backgroundColor: "rgb(220, 38, 38)", //"rgba(0, 0, 0, 1)",
-  },
-};
-
 interface IForm {
   keyword: string;
 }
@@ -128,6 +111,33 @@ function Header() {
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
+  const [searchParams] = useSearchParams();
+  const keyword = searchParams.get("keyword");
+
+  const navVariants = {
+    top: {
+      backgroundColor: "rgba(255, 255, 255, 0.5)",
+    },
+    scroll: {
+      backgroundColor: "rgb(220, 38, 38)", //"rgba(0, 0, 0, 1)",
+    },
+  };
+
+  const logoVariants: Variants = {
+    initial: { pathLength: 0, fill: "rgba(255, 255, 255,0.0)" },
+    whileHover: {
+      pathLength: [1, 0, 1],
+      fillOpacity: [1, 0, 1],
+      transition: {
+        repeat: Infinity,
+        duration: 5,
+      },
+    },
+    animate: {
+      pathLength: 1,
+      fill: scrollUpdate > 80 ? "rgba(255, 255, 255,1.0)" : "rgb(220, 38, 38)",
+    },
+  };
 
   const toggleSearch = () => {
     if (searchOpen) {

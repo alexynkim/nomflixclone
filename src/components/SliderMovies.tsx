@@ -5,12 +5,18 @@ import { useQuery } from "@tanstack/react-query";
 import { makeImagePath } from "../utils.ts";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { IGetMediaResult, IGetData, IMedia, isMovie } from "../api.ts";
+import {
+  IGetMediaResult,
+  IGetData,
+  IMedia,
+  isMovie,
+  bannerStatusAtom,
+} from "../api.ts";
 import Arrow from "./Arrow.tsx";
 
 const Slider = styled.div`
   position: relative;
-  top: -100px;
+  height: 300px;
   display: flex;
   justify-content: left;
   flex-direction: column;
@@ -67,8 +73,10 @@ const Info = styled(motion.div)`
 const Loader = styled.div`
   height: 20vh;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
+  color: white;
+  margin-left: 100px;
 `;
 
 //============================================================================
@@ -128,7 +136,6 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
   const offset = 6;
 
   //filtering data without image
-  //console.log("before :", data?.results.length);
   const filtered = data?.results.filter((movie) =>
     movie.backdrop_path ? true : false
   );
@@ -136,7 +143,6 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
   if (data && data.results && filtered) {
     data.results = [...filtered];
   }
-  //console.log("After :", data?.results.length);
 
   const dataLength = data ? data.results.length : 0;
 
@@ -145,16 +151,15 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
     setLeaving((prev) => !prev); //TRUE -> FALSE
     setIsRight(bRight);
 
-    //console.log("dataLength :", dataLength);
     if (dataLength === 0 || dataLength < offset) return;
 
-    if (bRight) setIndex((prev) => (prev + offset) % dataLength);
-    //prev + 2 <= Math.floor(data!.results.length / offset) ? prev + 1 : 0);
-    else
+    if (bRight) {
+      setIndex((prev) => (prev + offset) % dataLength);
+    } else {
       setIndex(
         (prev) => (((prev - offset) % dataLength) + dataLength) % dataLength
       );
-    //prev - 1 >= 0 ? prev - 1 : Math.floor(data!.results.length / offset) - 1);
+    }
   };
 
   const onBoxClicked = (media: IMedia) => {
@@ -182,57 +187,59 @@ function SliderMovies({ MediaData }: { MediaData: IGetData }) {
           ...data?.results.slice(0, (index + offset) % dataLength),
         ]
       : (data?.results ?? []).slice(index, index + offset);
-  //console.log("index", index, filteredResults.length);
+
   return (
     <>
       <Slider>
         <Title>{slidingTitle}</Title>
         {isLoading ? (
           <Loader>Loading...</Loader>
+        ) : filteredResults.length === 0 ? (
+          <Loader>No Search Results</Loader>
         ) : (
-          <AnimatePresence
-            initial={false}
-            onExitComplete={toggleLeaving}
-            custom={isRight}
-          >
-            <Row
-              variants={rowVariants}
+          <>
+            <AnimatePresence
+              initial={false}
+              onExitComplete={toggleLeaving}
               custom={isRight}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ type: "tween", duration: 1 }}
-              key={index}
             >
-              {/* {data?.results
-                .slice(offset * index, offset * index + offset) */}
-              {filteredResults?.map((media, ii) => (
-                <Box
-                  layoutId={media.id + "" + MediaData.key}
-                  key={media.id}
-                  whileHover="hover"
-                  initial="normal"
-                  variants={boxVariants}
-                  onClick={() => onBoxClicked(media)}
-                  transition={{ type: "tween" }}
-                  $bgphoto={makeImagePath(
-                    media.backdrop_path || media.poster_path,
-                    "w500"
-                  )}
-                >
-                  <Info variants={infoVariants}>
-                    {isMovie(media) ? (
-                      <h4>{media.title}</h4>
-                    ) : (
-                      <h4>{media.name}</h4>
+              <Row
+                variants={rowVariants}
+                custom={isRight}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ type: "tween", duration: 1 }}
+                key={index}
+              >
+                {filteredResults?.map((media, ii) => (
+                  <Box
+                    layoutId={media.id + "" + MediaData.key}
+                    key={media.id}
+                    whileHover="hover"
+                    initial="normal"
+                    variants={boxVariants}
+                    onClick={() => onBoxClicked(media)}
+                    transition={{ type: "tween" }}
+                    $bgphoto={makeImagePath(
+                      media.backdrop_path || media.poster_path,
+                      "w500"
                     )}
-                  </Info>
-                </Box>
-              ))}
-            </Row>
-          </AnimatePresence>
+                  >
+                    <Info variants={infoVariants}>
+                      {isMovie(media) ? (
+                        <h4>{media.title}</h4>
+                      ) : (
+                        <h4>{media.name}</h4>
+                      )}
+                    </Info>
+                  </Box>
+                ))}
+              </Row>
+            </AnimatePresence>
+            <Arrow slidingIndex={slidingIndex} />
+          </>
         )}
-        <Arrow slidingIndex={slidingIndex} />
       </Slider>
     </>
   );

@@ -1,5 +1,12 @@
+import { atom } from "recoil";
+
 const API_KEY = "70bd27b483e78304dc732a3fa531b5b0"; //My API data
 const BASE_PATH = "https://api.themoviedb.org/3";
+
+export const bannerStatusAtom = atom({
+  key: "BannerStatus",
+  default: false,
+});
 
 export interface IMedia {
   id: number;
@@ -29,12 +36,12 @@ export interface IGetData {
   fetchFn: (keyword: string) => Promise<IGetMediaResult>;
 }
 
-export interface IGetDetailData {
+interface IGetDetailData {
   key: string;
   fetchFn: (id: string) => Promise<IGetDetail>;
 }
 
-export interface IGetCreditData {
+interface IGetCreditData {
   key: string;
   fetchFn: (id: string) => Promise<ICreditData>;
 }
